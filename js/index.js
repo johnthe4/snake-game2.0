@@ -4,25 +4,29 @@ const ctx=canvas.getContext('2d');
 document.body.addEventListener('keydown', keyDown);
 
 let tileCount = game.clientHeight / 20;
-let tileSize = game.clientHeight / 20 - 2;
+let tileSize = 18;
 
 let speed = 10; // 7 times a second
 
 // array of snake
 const snakeParts = [];
-let tailLength=40;
+let tailLength=4;
 
 //start point for snake
-let headX = 2;
-let headY = 2;
+let headX =9;
+let headY =9;
 
 // speed of snake
 let xvel =0;
 let yvel =0;
 
+// store previous move 
+let prevX = 0;
+let prevY = 0;
+
 // draw apple
-    appleX=Math.floor(Math.random() * tileCount);
-    appleY=Math.floor(Math.random() * tileCount);
+appleX=Math.floor(Math.random() * tileCount);
+appleY=Math.floor(Math.random() * tileCount);
 
 let score = 0;
 
@@ -57,6 +61,10 @@ function drawSnake() {
     }
     ctx.fillStyle="orange";
     ctx.fillRect(headX * tileCount, headY * tileCount, tileSize, tileSize)
+
+    // store previous direction 
+    prevX = xvel;
+    prevY = yvel;
 }
 
 function clearScreen() {
@@ -67,31 +75,28 @@ function clearScreen() {
 function keyDown(event) {
     // up
     if(event.keyCode==38) {
-        // let lenth = snakeParts.length;
-        // let part = snakeParts[lenth-1];
-        // if (part.y < headY)
-        if (yvel == 1)  // check to make sure not going down
+        if (prevY == 1)  // check to make sure not going down
             return;
         yvel = -1; // move one tile up
         xvel = 0;
     }
     // down
     if(event.keyCode==40) {
-        if (yvel == -1)
+        if (prevY == -1)
             return;
         yvel = 1; // move one tile down
         xvel = 0;
     }
     // left
     if(event.keyCode==37) {
-        if (xvel == 1)
+        if (prevX == 1)
             return;
         yvel = 0; 
         xvel = -1; // move one tile left
     }
     // right
     if(event.keyCode==39) {
-        if (xvel == -1)
+        if (prevX == -1)
             return;
         yvel = 0; 
         xvel = 1; // move one tile right
@@ -158,6 +163,7 @@ function checkCollision() {
         // make sure apple cannot spawn in snake
         let empty = true;
         while (empty) {
+            empty = false;
             for(let i=0; i < snakeParts.length; i++) {
                 let part = snakeParts[i];
                 if(appleX == part.x  ) {
@@ -165,10 +171,10 @@ function checkCollision() {
                         appleX=Math.floor(Math.random() * tileCount);
                         appleY=Math.floor(Math.random() * tileCount);
                         
+                        empty = true;
                         break;
                     }
                 }
-                empty = false;
             }
         }
     }
